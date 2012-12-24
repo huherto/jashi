@@ -1,5 +1,7 @@
 package jashi;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 public class TestExecutor {
@@ -10,7 +12,20 @@ public class TestExecutor {
 		
 		String[] args = {"test/jashi/hellojashi.java"};
 		
-		e.parse(args);
+		e.parseArgs(args);
 		e.compile();
+	}
+	
+	@Test
+	public void testExecute() {
+		Executor e = new Executor();
+		String[] args = {"test/jashi/hellojashi.java"};
+		
+		e.parseArgs(args);
+		e.compile();
+		assertEquals("jashi", e.packname);
+		
+		assertEquals(0, e.execute());
+		
 	}
 }

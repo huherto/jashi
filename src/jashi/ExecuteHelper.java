@@ -17,16 +17,23 @@ public class ExecuteHelper {
 		while ((line = input.readLine()) != null) {
 			out.println(line);
 		}
-		out.flush();
-		
+		out.flush();		
 	}
 
 	public static int exec(String[] command) {
+		return exec(command, null, null);
+	}
+	
+	public static int exec(String[] command, String[] envp) {
+		return exec(command, null, null);
+	}
+	
+	public static int exec(String[] command, String[] envp, File dir) {
 		try {
 			Runtime rt = Runtime.getRuntime();
 			System.out.println(Arrays.toString(command));
 			System.out.flush();
-			Process proc = rt.exec(command);
+			Process proc = rt.exec(command, envp);
 			redirectInputOutput(proc.getInputStream(), System.out);
 			redirectInputOutput(proc.getErrorStream(), System.err);
 			return proc.waitFor();

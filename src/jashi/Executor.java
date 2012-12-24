@@ -4,19 +4,24 @@ import static jashi.ExecuteHelper.exec;
 import static jashi.FileHelper.toFile;
 
 import java.io.File;
-
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class Executor {
 	
 	private String javaFilename;
 	private File javaSrcFile;
 	private File jashiDir;
+	private File workDir;
+	private List<String> sourceLines;
+	public String packname;
 
 	public static void main(String[] args) {
 		
 		Executor e = new Executor();
 		
-		e.parse(args);
+		e.parseArgs(args);
 		e.compile();
 		
 	}
@@ -50,23 +55,82 @@ public class Executor {
 		
 		return jashiDir;
 	}
+	
+	public void parseSource() {
+	
+		Pattern pat = Pattern.compile("package\\s+(\\w+)");
+		for(String line : sourceLines) {
+			
+			Matcher mat = pat.matcher(line);
+			if (mat.find()) {
+				packname = mat.group(1);
+			}
+			
+		}
+	}	
 
 	public void compile() {
 		
+		
+		sourceLines = FileHelper.readAll(javaSrcFile);
+		
+		parseSource();
+
+		String str = joinString(sourceLines);
+		
+		String sha1 = Encoder.toSha1(str.getBytes());
+		
+		workDir = new File(getJashiDir(), sha1);
+		if (workDir.exists() && workDir.isDirectory()) {
+			// No need to compile.
+			return;			
+		}
+		
+		if (!workDir.mkdirs()) {
+			throw new JashiException("Cannot mkdir '"+workDir+"'");
+		}
+		
 		String command[] = {
 				"javac",
+				"-d", workDir.toString(),
 				javaSrcFile.toString()
 		};
 		
-		int exitVal =  exec(command);
-		System.out.println("exitVal="+exitVal);
-		System.out.flush();
+		int exitVal =  exec(command, null, null);
 		if (exitVal != 0) {
 			throw new JashiException("Failed compilation");
 		}
 	}
 
-	public void parse(String[] args) {
+	private String joinString(List<String> lines) {
+		StringBuilder sb = new StringBuilder();
+		for(String line : lines ) {
+			sb.append(line);
+		}
+		return sb.toString();
+	}
+	
+	public int execute() {
+		
+		String classname = javaSrcFile.getName().replace(".java", "");
+		
+		if (packname != null) {
+			classname = packname + "." + classname;
+		}
+		
+		String command[] = {
+				"java",
+				"-cp", workDir.toString(),
+				classname
+				
+		};
+		
+		int exitVal =  exec(command, null, null);
+		
+		return exitVal;
+	}
+	
+	public void parseArgs(String[] args) {
 		if (args.length == 0) {
 			usage();
 		}
