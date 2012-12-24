@@ -1,12 +1,12 @@
 package jashi;
 
 import static jashi.FileHelper.ftest;
+import static jashi.FileHelper.getCurrentDir;
+import static jashi.FileHelper.glob;
 import static jashi.FileHelper.iterable;
 import static jashi.FileHelper.openReader;
 import static jashi.FileHelper.openWriter;
 import static jashi.FileHelper.readAll;
-import static jashi.FileHelper.getCurrentDir;
-import static jashi.FileHelper.glob;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -15,7 +15,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -82,6 +81,7 @@ public class TestFileHelper {
 	
 	@Test
 	public void testCurrentDir() {
+		// We need to make it independent.
 		assertEquals(new File("/home/humberto/workspace/jashi"), getCurrentDir());
 	}
 	
