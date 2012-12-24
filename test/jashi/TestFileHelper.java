@@ -7,6 +7,7 @@ import static jashi.FileHelper.iterable;
 import static jashi.FileHelper.openReader;
 import static jashi.FileHelper.openWriter;
 import static jashi.FileHelper.readAll;
+import static jashi.FileHelper.toFile;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -18,7 +19,6 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import org.junit.Test;
-
 
 @jashi.Config({
 	@jashi.Classpath("."),
@@ -36,7 +36,7 @@ public class TestFileHelper {
 
 	@Test
 	public void testWriter() {
-		PrintWriter writer = openWriter("myfile.txt", false);
+		PrintWriter writer = openWriter("test/myfile.txt", false);
 		for(int i = 0; i < 10; i++) {
 			writer.println("i="+i);
 		}
@@ -46,7 +46,7 @@ public class TestFileHelper {
 	@Test
 	public void testReader() throws IOException 
 	{
-		BufferedReader reader = openReader("myfile.txt");
+		BufferedReader reader = openReader("test/myfile.txt");
 		String line = reader.readLine();
 		while (line != null) {
 			System.out.println(line);
@@ -56,7 +56,7 @@ public class TestFileHelper {
 	
 	@Test
 	public void testReadAll() {
-		List<String> lines = readAll("myfile.txt");
+		List<String> lines = readAll("test/myfile.txt");
 		assertTrue(lines.size() == 10);
 	}
 	
@@ -64,7 +64,7 @@ public class TestFileHelper {
 	public void testIterate() {
 		
 		int count = 0;
-		for(String line : iterable("myfile.txt")) {
+		for(String line : iterable("test/myfile.txt")) {
 			count++;
 		}	
 		assertEquals(10, count);
@@ -72,11 +72,11 @@ public class TestFileHelper {
 	
 	@Test
 	public void testftest() {
-		assertTrue(ftest("-r", "myfile.txt"));
-		assertTrue(ftest("-w", "myfile.txt"));
-		assertFalse(ftest("-x", "myfile.txt"));
-		assertTrue(ftest("-f", "myfile.txt"));
-		assertFalse(ftest("-d", "myfile.txt"));
+		assertTrue(ftest("-r", "test/myfile.txt"));
+		assertTrue(ftest("-w", "test/myfile.txt"));
+		assertFalse(ftest("-x", "test/myfile.txt"));
+		assertTrue(ftest("-f", "test/myfile.txt"));
+		assertFalse(ftest("-d", "test/myfile.txt"));
 	}
 	
 	@Test
@@ -87,5 +87,20 @@ public class TestFileHelper {
 	
 	public void testGlob() {
 		assertEquals("", glob(""));
+	}
+	
+	@Test
+	public void testToFile() {
+		
+		assertEquals("/home/humberto",toFile("~").toString());
+		assertEquals("/tmp",toFile("/tmp").toString());
+		assertEquals("/home/humberto", toFile("/home/humberto").toString());
+		assertEquals("/home/humberto/.jashi", toFile("~/.jashi").toString());
+		assertEquals("src", toFile("src").toString());
+		assertEquals("src/java", toFile("src/java").toString());
+		
+		File file = toFile("test/jashi/hellojashi.java");
+		assertTrue(file.exists());
+		assertEquals("test/jashi/hellojashi.java", file.toString());
 	}
 }

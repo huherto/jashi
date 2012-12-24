@@ -1,6 +1,7 @@
 package jashi;
 
 import static jashi.ExecuteHelper.exec;
+import static jashi.FileHelper.toFile;
 
 import java.io.File;
 
@@ -52,11 +53,14 @@ public class Executor {
 
 	public void compile() {
 		
-		String javacArgs[] = {
+		String command[] = {
+				"javac",
 				javaSrcFile.toString()
 		};
 		
-		int exitVal =  exec("javac", javacArgs, FileHelper.getCurrentDir());
+		int exitVal =  exec(command);
+		System.out.println("exitVal="+exitVal);
+		System.out.flush();
 		if (exitVal != 0) {
 			throw new JashiException("Failed compilation");
 		}
@@ -69,11 +73,11 @@ public class Executor {
 		
 		javaFilename = args[0];
 		
-		if (FileHelper.ftest("-f", new File(javaFilename))) {
+		if (!FileHelper.ftest("-f", javaFilename)) {
 			throw new JashiException("Can't find file '"+javaFilename+"'");
 		}
 		
-		javaSrcFile = new File(javaFilename);
+		javaSrcFile = toFile(javaFilename);
 	}
 
 	private void usage() {

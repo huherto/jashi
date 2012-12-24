@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.Arrays;
 
 public class ExecuteHelper {
 	
@@ -20,10 +21,12 @@ public class ExecuteHelper {
 		
 	}
 
-	public static int exec(String command, String[] args, File dir) {
+	public static int exec(String[] command) {
 		try {
 			Runtime rt = Runtime.getRuntime();
-			Process proc = rt.exec(command, args, FileHelper.getCurrentDir());
+			System.out.println(Arrays.toString(command));
+			System.out.flush();
+			Process proc = rt.exec(command);
 			redirectInputOutput(proc.getInputStream(), System.out);
 			redirectInputOutput(proc.getErrorStream(), System.err);
 			return proc.waitFor();

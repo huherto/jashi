@@ -14,11 +14,45 @@ import java.util.List;
 
 import org.apache.tools.ant.DirectoryScanner;
 
-
+/**
+ * Help ease some file operations.
+ * 
+ * Assumptions:
+ *   - Filenames use unix separator '/'
+ *   - Avoid checked exceptions.
+ * 
+ * @author humberto
+ *
+ */
 public class FileHelper {
 	
+	private static File homeDir = null;
+	
+	public static File toFile(String fname) {
+		String[] segments = fname.split("/");
+		File[] files = new File[segments.length];
+		for(int i = 0; i < segments.length; i++) {
+			if (i == 0) {
+				if ("~".equals(segments[i])) {
+					files[i] = getHomeDir();
+				}
+				else if ("".equals(segments[i])) {
+					files[i] = getRootDir();
+				}
+				else {
+					files[i] = new File(segments[i]);					
+				}
+			}
+			else {
+				files[i] = new File(files[i-1], segments[i]);
+			}
+		}
+		
+		return files[files.length - 1];	
+	}
+	
 	public static BufferedReader openReader(String fname) {
-		return openReader(new File(fname));
+		return openReader(toFile(fname));
 	}
 	
 	private static BufferedReader openReader(File file) {
@@ -32,7 +66,7 @@ public class FileHelper {
 	}
 
 	public static PrintWriter openWriter(String fname, boolean append) {
-		return openWriter(new File(fname), append);
+		return openWriter(toFile(fname), append);
 	}
 	
 	public static PrintWriter openWriter(File file, boolean append) {
@@ -49,7 +83,7 @@ public class FileHelper {
 	}
 	
 	public static List<String> readAll(String fname) {
-		return readAll(new File(fname));
+		return readAll(toFile(fname));
 	}
 
 	public static List<String> readAll(File file) {
@@ -71,7 +105,7 @@ public class FileHelper {
 	}
 	
 	public static boolean ftest(String flag, String fname) {
-		return ftest(flag, new File(fname));
+		return ftest(flag, toFile(fname));
 	}
 	
 	public static boolean ftest(String flag, File file) {
@@ -113,7 +147,7 @@ public class FileHelper {
 	}
 	
 	public static IterableFileAdapter iterable(String fname) {
-		return iterable(new File(fname));
+		return iterable(toFile(fname));
 	}
 	
 	private static <T> T[] concat(T[] first, T[] second) {
@@ -132,6 +166,18 @@ public class FileHelper {
 		}
 	}
 	
+	public static File getHomeDir() {
+		if (homeDir == null) {
+			homeDir = new File(System.getProperty("user.home"));
+		}
+		return homeDir;
+	}
+	
+	private static File getRootDir() {
+		// Assume unix
+		return File.listRoots()[0];
+	}
+
 	public static String[] glob(String glob) {
 		
 		try {
@@ -141,8 +187,8 @@ public class FileHelper {
 			scanner.setBasedir((new File(".")).getCanonicalFile());
 			scanner.scan();
 			return concat(scanner.getIncludedDirectories(), scanner.getIncludedFiles());
-
-		} catch (IOException e) {
+		} 
+		catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
