@@ -20,11 +20,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-@jashi.Config({
-	@jashi.Classpath("."),
-	@jashi.Classpath(".."),
-	@jashi.Classpath("org.apache.commons:commons-io:2.4")
-})
 public class TestFileHelper {
 
 	@Test
@@ -36,7 +31,7 @@ public class TestFileHelper {
 
 	@Test
 	public void testWriter() {
-		PrintWriter writer = openWriter("test/myfile.txt", false);
+		PrintWriter writer = openWriter("target/myfile.txt", false);
 		for(int i = 0; i < 10; i++) {
 			writer.println("i="+i);
 		}
@@ -46,7 +41,7 @@ public class TestFileHelper {
 	@Test
 	public void testReader() throws IOException 
 	{
-		BufferedReader reader = openReader("test/myfile.txt");
+		BufferedReader reader = openReader("target/myfile.txt");
 		String line = reader.readLine();
 		while (line != null) {
 			System.out.println(line);
@@ -56,7 +51,7 @@ public class TestFileHelper {
 	
 	@Test
 	public void testReadAll() {
-		List<String> lines = readAll("test/myfile.txt");
+		List<String> lines = readAll("target/myfile.txt");
 		assertTrue(lines.size() == 10);
 	}
 	
@@ -64,7 +59,7 @@ public class TestFileHelper {
 	public void testIterate() {
 		
 		int count = 0;
-		for(String line : iterable("test/myfile.txt")) {
+		for(String line : iterable("target/myfile.txt")) {
 			count++;
 		}	
 		assertEquals(10, count);
@@ -72,11 +67,11 @@ public class TestFileHelper {
 	
 	@Test
 	public void testftest() {
-		assertTrue(ftest("-r", "test/myfile.txt"));
-		assertTrue(ftest("-w", "test/myfile.txt"));
-		assertFalse(ftest("-x", "test/myfile.txt"));
-		assertTrue(ftest("-f", "test/myfile.txt"));
-		assertFalse(ftest("-d", "test/myfile.txt"));
+		assertTrue(ftest("-r", "target/myfile.txt"));
+		assertTrue(ftest("-w", "target/myfile.txt"));
+		assertFalse(ftest("-x", "target/myfile.txt"));
+		assertTrue(ftest("-f", "target/myfile.txt"));
+		assertFalse(ftest("-d", "target/myfile.txt"));
 	}
 	
 	@Test
@@ -99,8 +94,8 @@ public class TestFileHelper {
 		assertEquals("src", toFile("src").toString());
 		assertEquals("src/java", toFile("src/java").toString());
 		
-		File file = toFile("test/jashi/hellojashi.java");
+		File file = toFile("src/test/java/jashi/hellojashi.java");
 		assertTrue(file.exists());
-		assertEquals("test/jashi/hellojashi.java", file.toString());
+		assertEquals("src/test/java/jashi/hellojashi.java", file.toString());
 	}
 }

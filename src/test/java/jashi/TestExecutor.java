@@ -10,7 +10,7 @@ public class TestExecutor {
 	public void testCompile() {
 		Executor e = new Executor();
 		
-		String[] args = {"test/jashi/hellojashi.java"};
+		String[] args = {"src/test/java/jashi/hellojashi.java"};
 		
 		e.parseArgs(args);
 		e.compile();
@@ -19,7 +19,7 @@ public class TestExecutor {
 	@Test
 	public void testExecute() {
 		Executor e = new Executor();
-		String[] args = {"test/jashi/hellojashi.java"};
+		String[] args = {"src/test/java/jashi/hellojashi.java"};
 		
 		e.parseArgs(args);
 		e.compile();

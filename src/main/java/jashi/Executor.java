@@ -4,6 +4,7 @@ import static jashi.ExecuteHelper.exec;
 import static jashi.FileHelper.toFile;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -15,6 +16,7 @@ public class Executor {
 	private File jashiDir;
 	private File workDir;
 	private List<String> sourceLines;
+	private List<String> dependencies = new ArrayList<String>();
 	public String packname;
 
 	public static void main(String[] args) {
@@ -28,8 +30,8 @@ public class Executor {
 	
 	public File getHomeDir() {
 		String homeDirName = System.getProperty("user.home");
-		if (FileHelper.ftest("-d", homeDirName)) {
-			System.err.println("Directory doesn't exist");
+		if (!FileHelper.ftest("-d", homeDirName)) {
+			System.err.println("Directory doesn't exist"+homeDirName);
 			
 		}
 		return new File(homeDirName);
@@ -41,7 +43,7 @@ public class Executor {
 			return jashiDir;
 		}
 		
-		jashiDir = new File(getHomeDir(), ".jashi"); 
+		jashiDir = toFile("~/.jashi");
 		if (!jashiDir.exists()) {
 			if (jashiDir.mkdir()) {
 				return jashiDir;
@@ -58,15 +60,27 @@ public class Executor {
 	
 	public void parseSource() {
 	
+		Pattern cpPat = Pattern.compile("^\\s*@Classpath\\(\"(.*)\"\\)");
+		
 		Pattern pat = Pattern.compile("package\\s+(\\w+)");
 		for(String line : sourceLines) {
 			
 			Matcher mat = pat.matcher(line);
 			if (mat.find()) {
 				packname = mat.group(1);
+				continue;
 			}
 			
+			mat = cpPat.matcher(line);
+			if (mat.find()) {
+				dependencies.add(mat.group(1));
+			}
 		}
+		
+		for(String dependency : dependencies) {
+			System.out.println(dependency);
+		}
+		
 	}	
 
 	public void compile() {
@@ -93,11 +107,13 @@ public class Executor {
 		String command[] = {
 				"javac",
 				"-d", workDir.toString(),
+				"-cp", "target/classes",
 				javaSrcFile.toString()
 		};
 		
 		int exitVal =  exec(command, null, null);
 		if (exitVal != 0) {
+			workDir.delete();
 			throw new JashiException("Failed compilation");
 		}
 	}
@@ -105,7 +121,7 @@ public class Executor {
 	private String joinString(List<String> lines) {
 		StringBuilder sb = new StringBuilder();
 		for(String line : lines ) {
-			sb.append(line);
+			sb.append(line).append("\n");
 		}
 		return sb.toString();
 	}
