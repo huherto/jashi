@@ -25,7 +25,8 @@ public class Executor {
 		
 		e.parseArgs(args);
 		e.compile();
-		
+		int ret = e.execute();
+		System.exit(ret);		
 	}
 	
 	public File getHomeDir() {
