@@ -1,26 +1,25 @@
 #!/bin/bash
 
+set -e # End if any command fails.
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 INSTALL_DIR=~/.jashi
 
-mkdir -p $INSTALL_DIR/bin $INSTALL_DIR/jars
+mkdir -p $INSTALL_DIR
 
+cd $DIR
+mvn install # install target/jashi-*.jar in ~/.m2 repository
+
+cd $DIR/jashi-exec
+mvn clean
 mvn package
-mvn dependency:copy-dependencies
 
-cp target/dependency/*.jar $INSTALL_DIR/jars
-
-CLASSPATH=""
-for JAR in $INSTALL_DIR/jars/*.jar
-do
-	CLASSPATH=$CLASSPATH:$JAR
-done
-
-JASHI_JAR=target/jashi-*.jar
-cp $JASHI_JAR $INSTALL_DIR/jashi.jar
+JASHI_JAR=$DIR/jashi-exec/target/jashi-exec-*.jar
+cp $JASHI_JAR $INSTALL_DIR/jashi-exec.jar
 
 (
 	echo "#!/bin/bash"
-	echo "java -cp $INSTALL_DIR/jashi.jar$CLASSPATH jashi.Executor "'$*'
+	echo "java -jar $INSTALL_DIR/jashi-exec.jar "'$*'
 ) > $INSTALL_DIR/jashi
 
 chmod +x $INSTALL_DIR/jashi
