@@ -61,9 +61,10 @@ public class Executor {
 	
 	public void parseSource() {
 	
-		Pattern cpPat = Pattern.compile("^\\s*@Classpath\\(\"(.*)\"\\)");
+		Pattern cpPat = Pattern.compile("^\\s*@jashi.Classpath\\(\"(.*)\"\\)");
 		
 		Pattern pat = Pattern.compile("package\\s+(\\w+)");
+		System.out.println("parsing source code");
 		for(String line : sourceLines) {
 			
 			Matcher mat = pat.matcher(line);
@@ -83,6 +84,35 @@ public class Executor {
 		}
 		
 	}	
+	
+	private String makeClasspath() {
+	    StringBuilder sb = new StringBuilder();
+	    sb.append("target/classes");
+	    for(String d : dependencies) {
+	        if (d.equals(".")) {
+	            sb.append(":.");
+	        }
+	        else if (d.equals("..")) {
+                sb.append(":..");
+	        }
+	        else {
+    	        
+    	            
+    	        String f[] = d.split(":");
+    	        if (f.length != 3) {
+    	            throw new JashiException("bad dependency format..."+d);
+    	        }
+    	        sb
+    	            .append(":")    	            
+    	            .append(FileHelper.getHomeDir()+"/.m2/repository/")
+    	            .append(f[0].replace(".", "/") + "/")
+                    .append(f[1] + "/")
+    	            .append(f[2] + "/")
+    	            .append(f[1]+"-"+f[2]+".jar");	        
+	        }
+	    }
+	    return sb.toString();
+	}
 
 	public void compile() {
 		
@@ -108,7 +138,7 @@ public class Executor {
 		String command[] = {
 				"javac",
 				"-d", workDir.toString(),
-				"-cp", "target/classes",
+				"-cp", makeClasspath(),
 				javaSrcFile.toString()
 		};
 		

@@ -24,19 +24,16 @@ class LineIterator implements Iterator<String> {
 		}
 	}
 
-	@Override
 	public boolean hasNext() {
 		return next != null;
 	}
 
-	@Override
 	public String next() {
 		String sav = next;
 		next = readLine();
 		return sav;
 	}
 
-	@Override
 	public void remove() {
 		throw new RuntimeException("Operation not allowed");
 	}		

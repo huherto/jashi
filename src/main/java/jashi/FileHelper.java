@@ -135,7 +135,6 @@ public class FileHelper {
 			this.file = file;
 		}
 
-		@Override
 		public Iterator<String> iterator() {
 			return new LineIterator(openReader(file));
 		}
