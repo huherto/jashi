@@ -1,10 +1,10 @@
 jashi
 =====
- Java shell scripting. Project goals...
- 1 Easy to execute. No compilation needed.
- 2 Easy file manipulation.
- 3 Easy to use external java libraries.
- 4 Easy to install.
+Java shell scripting. Project goals...
+1. Easy to execute. No compilation needed.
+2. Easy file manipulation.
+3. Easy to use external java libraries.
+4. Easy to install.
 
 
 This is was experimental project. I wanted to use Java for scripting the way I use Perl or Python.
