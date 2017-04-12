@@ -5,8 +5,10 @@ import static jashi.FileHelper.toFile;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import java.util.regex.Matcher;
 
 public class Executor {
@@ -18,6 +20,7 @@ public class Executor {
 	private List<String> sourceLines;
 	private List<String> dependencies = new ArrayList<String>();
 	public String packname;
+	private String args[];
 
 	public static void main(String[] args) {
 		
@@ -134,13 +137,15 @@ public class Executor {
 		if (!workDir.mkdirs()) {
 			throw new JashiException("Cannot mkdir '"+workDir+"'");
 		}
-		
+				
 		String command[] = {
 				"javac",
 				"-d", workDir.toString(),
 				"-cp", makeClasspath(),
 				javaSrcFile.toString()
 		};
+		
+		
 		
 		int exitVal =  exec(command, null, null);
 		if (exitVal != 0) {
@@ -168,10 +173,11 @@ public class Executor {
 		String command[] = {
 				"java",
 				"-cp", workDir.toString(),
-				classname
-				
+				classname		
 		};
 		
+		command = Stream.concat(Arrays.stream(command), Arrays.stream(args)).toArray(String[]::new);
+				
 		int exitVal =  exec(command, null, null);
 		
 		return exitVal;
@@ -189,6 +195,11 @@ public class Executor {
 		}
 		
 		javaSrcFile = toFile(javaFilename);
+		
+		this.args = new String[ args.length - 1 ]; 
+		for(int i = 1; i < args.length; i++) {
+		    this.args[i -1 ] = args[i];
+		}
 	}
 
 	private void usage() {
